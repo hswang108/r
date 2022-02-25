@@ -1,0 +1,714 @@
+\documentclass[8pt,usenames,dvipsnames]{beamer}
+\usepackage{booktabs}
+
+%\usepackage[AutoFakeBold,AutoFakeSlant]{xeCJK}  
+%\setCJKmainfont[AutoFakeSlant=.1,AutoFakeBold=1]{cwTeX Q Kai Medium} 
+%\setCJKfamilyfont{kaiv}[Vertical=RotatedGlyphs]{cwTeX Q Medium}
+\usepackage[useregional]{datetime2}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+
+\setbeamertemplate{headline}{}
+\title{Data Science and R}
+\author{Chang-Ye Tu}
+\date{}%\today}
+
+\usepackage{bm}
+\usepackage{upgreek}
+\usepackage{multirow}
+
+% XXX https://tex.stackexchange.com/questions/216435/how-do-i-properly-label-the-figures-and-tables-in-beamer-in-share-latex
+\setbeamertemplate{caption}[numbered]{} % Number float-like environments
+
+% https://tex.stackexchange.com/questions/387186/how-to-change-the-footer-of-madrid-theme-in-latex
+%\makeatletter
+%\setbeamertemplate{footline}{
+%  \leavevmode%
+%  \hbox{%
+%  \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+%    \usebeamerfont{author in head/foot}\insertshortauthor\expandafter\ifblank\expandafter{\beamer@shortinstitute}{}{~~(\insertshortinstitute)}
+%  \end{beamercolorbox}%
+%  \begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+%    \usebeamerfont{title in head/foot}\insertshorttitle
+%  \end{beamercolorbox}%
+%  \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+%    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+%    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+%  \end{beamercolorbox}}%
+%  \vskip0pt%
+%}
+%\makeatother
+
+\setbeamertemplate{footline}[text line]{%
+  \parbox{\linewidth}{\vspace*{-8pt}
+  \href{https://github.com/chang-ye-tu/r}{\DTMnow\,\,https://github.com/chang-ye-tu/r} \hfill
+  \hyperlink{toc}{TOC} ~~ \insertframenumber / \inserttotalframenumber~~~~~~~~~}}
+\setbeamertemplate{navigation symbols}[only frame symbol]
+
+% white letters in enumerate bullet points
+%\definecolor{stupidblue}{RGB}{51,51,178}
+\setbeamercolor{item projected}{fg=white}%fg=blue,bg=red!75!black} % fg=white , bg=stupidblue
+\setbeamercolor{frametitle}{fg=black}
+% Block title color
+\setbeamercolor{block title}{fg=white}%fg=blue,bg=red!75!black} % white
+%\setbeamertemplate{item projected}[square]
+
+% Custom font size for a frame. 
+% https://tex.stackexchange.com/questions/33969/changing-font-size-of-selected-slides-in-beamer 
+\usepackage{environ}
+\newcommand{\customframefont}[1]{
+\setbeamertemplate{itemize/enumerate body begin}{#1}
+\setbeamertemplate{itemize/enumerate subbody begin}{#1}
+}
+
+\NewEnviron{framefont}[1]{
+\customframefont{#1} % for itemize/enumerate
+{#1 % For the text outside itemize/enumerate
+\BODY
+}
+\customframefont{\normalsize}
+}
+
+\definecolor{foo}{rgb}{.2,.2,.7}
+\AtBeginSection[]{
+    \begin{frame}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{section page}
+        \usebeamerfont{title}%
+        {\color{foo} \insertsectionhead}\par%
+    \end{beamercolorbox}
+    \vfill
+    \end{frame}
+}
+
+% https://tex.stackexchange.com/questions/30423/bibliography-in-beamer
+
+\setbeamertemplate{bibliography entry title}{}
+\setbeamertemplate{bibliography entry location}{}
+\setbeamertemplate{bibliography entry note}{}
+
+% https://tex.stackexchange.com/questions/106714/stmaryrd-and-boldsymbol-avoid-warnings
+%\usepackage{stmaryrd}
+%\SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n}
+
+\newtheorem*{alg}{Algorithm}
+
+\DeclareMathOperator\prb{{\sf P}}
+\DeclareMathOperator\expc{{\sf E}}
+\DeclareMathOperator\var{var}
+\DeclareMathOperator\cov{cov}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+
+\usepackage{dsfont} % indicator function \mathds{1}
+\DeclareMathOperator\indc{\mathds{1}}
+\DeclareMathOperator\corr{corr}
+\DeclareMathOperator\rk{rank}
+
+\usepackage{threeparttable}
+\newcommand{\mycolor}[1]{\textcolor{Cyan}{#1}}
+
+% https://tex.stackexchange.com/questions/156016/how-do-i-make-a-small-pmatrix
+\newcommand\SmallMatrix[1]{{%
+  \footnotesize\arraycolsep=0.3\arraycolsep\ensuremath{\begin{pmatrix}#1\end{pmatrix}}}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\subsection*{Outline}
+%\begin{frame}
+%  \tableofcontents
+%\end{frame}
+
+\section{Before We Start}
+
+\begin{frame}{What is Data Science?}
+ Data science is a discipline that turns raw data into understanding, insight, and knowledge. 
+
+ \begin{itemize}
+    \vfill\item \href{https://www.amazon.com/}{Recommender Systems to Improve Sales} 
+    \vfill\item \href{https://google.com.tw}{Google AdSense}
+    \vfill\item \href{https://www.8451.com/}{Understand the Customer Behavior}
+    \vfill\item \ldots
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=.95\textwidth]{images/data-science.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=.95\textwidth]{images/data-science-2.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{I Would Like to Know\ldots}
+  \begin{itemize}
+    \item What is your experience with R?
+    \vfill\item What programming experience other than R do you have?
+    \vfill\item How are you using, or how do you plan to use, R in your job?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Software}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      The R Programming Language
+      \begin{itemize}
+        \item Go to \href{https://cran.r-project.org/}{the offical site.}
+        \item Click ``Download R for Mac/Windows''.
+        \item Follow the instructions of the installer 
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      RStudio (IDE)
+      \begin{itemize}
+        \item \href{https://www.rstudio.com/products/rstudio/download/\#download}{Choose ``RStudio for Desktop''.} 
+        \item Select the install file for your OS
+        \item Follow the instructions of the installer  
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Introductory R}
+
+<<include = FALSE>>=
+knitr::opts_chunk$set(comment = '#', fig.align = 'center')
+@
+
+\begin{frame}[fragile]
+  \frametitle{First R Steps I}
+  \begin{itemize}
+    \item<+-> R as a calculator --- show the numerical result of \mycolor{$1 + 2\times\frac{3}{4} - 5 + 6 \sin\frac{\pi}{2} - \sqrt[8]{7}$}
+      \begin{block}{}<+->
+<<>>=
+1 + 2 * (3 / 4) - 5 + 6 * sin(pi / 2) - 7^(1/8)
+@
+      \end{block}
+    \item Print the content of the built-in dataset {\bf Nile}
+      \begin{block}{}<+->
+<<>>=
+Nile
+str(Nile)
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{First R Steps II}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item<+-> Show the histogram of {\bf Nile}
+          \begin{block}{}<+->
+<<out.width = "90%">>=
+hist(Nile)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item Show the plot of {\bf Nile}
+          \begin{block}{}<+->
+<<out.width = "90%">>=
+plot(Nile)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Vectors and Indices I}
+  \begin{itemize}
+    \item<+-> The 2nd item of the {\bf Nile} dataset
+      \begin{block}{}<+->
+<<>>=
+Nile[2]
+@
+      \end{block}
+    \item Subsequence taken from 2nd to 5th item of {\bf Nile}
+      \begin{block}{}<+->
+<<>>=
+Nile[2:5]
+@
+      \end{block}
+    \item Subsequence taken from 2nd to 5th item of {\bf Nile}: using the important concatenate function \mycolor{{\tt c}}
+      \begin{block}{}<+->
+<<>>=
+Nile[c(2, 3, 4, 5)]
+@
+      \end{block}
+    \item Subsequence taken from 10th, 3rd, 15th item of {\bf Nile}
+      \begin{block}{}<+->
+<<>>=
+Nile[c(10, 3, 15)]
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Vectors and Indices II}
+  \begin{itemize}
+    \item<+-> Let {\tt x} be a (row) vector $(10, 20, -1, 3, 5, 6, 30, 9)$, print {\tt x}: 
+      \begin{block}{}<+->
+<<>>=
+x <- c(10, 20, -1, 3, 5, 6, 30, 9); x
+@
+      \end{block}
+    \item Let {\tt y} be a vector formed by taking the 2nd element out of {\tt x}; print {\tt y}: 
+      \begin{block}{}<+->
+<<>>=
+y <- x[-2]; y
+@
+      \end{block}
+    \item Let {\tt z} be a vector formed by taking the 2nd, 3rd, 6th element out of {\tt x}; print {\tt z}: 
+      \begin{block}{}<+->
+<<>>=
+z <- x[c(-2, -3, -6)]; z
+@
+      \end{block}
+    \item {\tt w <- c(x, y, z)}; print {\tt w}: 
+      \begin{block}{}<+->
+<<>>=
+w <- c(x, y, z); w
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Vectors and Indices III}
+  \begin{itemize}
+    \item<+-> Subsequence taken from 81th to 95th item of {\bf Nile}
+      \begin{block}{}<+->
+<<>>=
+Nile[81:95]
+@
+      \end{block}
+    \vfill\item Mean of the subsequence {\tt Nile[81:95]}
+      \begin{block}{}<+->
+<<>>=
+mean(Nile[81:95])
+@
+      \end{block}
+    \item Lengths of {\bf Nile}
+      \begin{block}{}<+->
+<<>>=
+length(Nile)
+@
+      \end{block}
+    \item Lengths of the subsequence {\tt Nile[81:95]}
+      \begin{block}{}<+->
+<<>>=
+length(Nile[81:95])
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Vectors and Indices IV}
+  \begin{itemize}
+    \item<+->  Let the vector {\tt x <- c(20, 1, 15, 13, 12)}. Print {\tt x > 14}:
+      \begin{block}{}<+->
+<<>>=
+x <- c(20, 1, 15, 13, 12); x > 14
+@
+      \end{block}
+    \item How many items in {\tt x} that $ > 14$ ? 
+      \begin{block}{}<+->
+<<>>=
+sum(x > 14)
+@
+      \end{block}
+    \item Which of the items in {\bf Nile} are $> 1200$ ? 
+      \begin{block}{}<+->
+<<>>=
+which(Nile > 1200)
+@
+      \end{block}
+    \item Print out the items in {\bf Nile} that $> 1200$.
+      \begin{block}{}<+->
+<<>>=
+Nile[Nile > 1200]
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Data Frame I}
+  \begin{itemize}
+    \item<+-> \mycolor{data frame}: a rectangular table consisting of one row for each data point. Built-in data frame {\bf ToothGrowth}, assigned {\tt tg}.
+    \vfill\item len: tooth length; supp: supplement VC (vitamin c) or OJ (orange juice); dose
+      \begin{block}{}<+->
+<<>>=
+head(ToothGrowth)
+@
+      \end{block}
+      \vfill\item Each column is a vector; use \mycolor{\$} to extract 
+      \begin{block}{}<+->
+<<>>=
+tg <- ToothGrowth; tg$len
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Data Frame II}
+  \begin{itemize}
+    \item<+-> To get the item of {\tt tg} in row 3, column 1  
+      \begin{block}{}<+->
+<<>>=
+tg[1, 3]
+@
+      \end{block}
+    \vfill\item To get the item of {\tt tg} in row 3, column 1: using that {\tt tg\$len} is a vector
+      \begin{block}{}<+->
+<<>>=
+tg$len[3]
+@
+      \end{block}
+    \vfill\item Extract rows 2 through 5, and columns 1 and 3, assigning the result to {\tt z}
+      \begin{block}{}<+->
+<<>>=
+z <- tg[2:5, c(1, 3)]; z
+@
+      \end{block}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Data Frame III}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item<+-> To get the items of {\tt tg} in columns 1, 3
+          \begin{block}{}<+->
+<<>>=
+head(tg[, c(1, 3)])
+@
+          \end{block}
+        \item To get the items of {\tt tg} in columns 1, 3: remove column 2
+          \begin{block}{}<+->
+<<>>=
+head(tg[, -2])
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item Create your own data frame from vectors of \mycolor{same} lengths
+          \begin{block}{}<+->
+<<>>=
+age <- c(55, 58, 45)
+name <- c('Alice', 'Bill', 'Cathy')
+d <- data.frame(age, name)
+d
+@
+          \end{block}
+        \item Note that \mycolor{vector of different lengths are not allowed} ! 
+          \begin{block}{}<+->
+<<>>=
+blood <- c('O', 'B', 'A', 'AB')
+data.frame(age, name, blood)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Extracting Rows / Columns from Data Frames}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item<+-> In {\tt tg}, compute mean tooth length for supplement VC and OJ
+          \begin{block}{}<+->
+<<>>=
+tg_vc <- tg[tg$supp == 'VC',]
+tg_oj <- tg[tg$supp == 'OJ',]
+mean(tg_vc$len)
+mean(tg_oj$len)
+@
+          \end{block}
+        \vfill\item Extract the sub data frame from {\tt tg} with supplement OJ \mycolor{and} length $< 8.8$
+          \begin{block}{}<+->
+<<>>=
+tg[tg$supp == 'OJ' & tg$len < 8.8,]
+@
+          \end{block}
+        \vfill\item \mycolor{Note the existence and the postion of the comma ({\tt,}) and the use of {\tt==} !} 
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{itemize}
+        \vfill\item Extract the sub data frame from {\tt tg} with length $> 28$ \mycolor{or} dose $=1.0$ 
+          \begin{block}{}<+->
+<<>>=
+w <- tg[tg$len == 28 | tg$dose == 1.0,]
+head(w, 15)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The {\tt tapply} Function}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item<+-> Imaging you have (age, gender) pairs \{(20, 'M'), (16, 'F'), (38, 'M'), (55, 'F'), (25, 'F')\}
+        \item<+-> Split {\tt age} into groups according to the corresponding elements of {\tt gender}; find the mean in each group.
+          \begin{block}{}<+->
+<<>>=
+age <- c(20, 16, 38, 55, 25)
+gender <- c('M', 'F', 'M', 'F', 'F')
+z <- tapply(age, gender, mean); z
+@
+          \end{block}
+        \item Using {\tt tapply} in {\tt tg} to compute the mean length for each supplement group.
+          \begin{block}{}<+->
+<<>>=
+tapply(tg$len, tg$supp, mean)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item In the built-in data {\bf mtcars}, using {\tt tapply} to find how many cars there are in each cylinder category. 
+          \begin{block}{}<+->
+<<>>=
+tapply(mtcars$cyl, mtcars$cyl, length)
+@
+          \end{block}
+        \item In {\bf mtcars}, using {\tt tapply} to find mean and standard deviation of miles per gallon in each cylinder category.
+          \begin{block}{}<+->
+<<>>=
+tapply(mtcars$mpg, mtcars$cyl, mean)
+tapply(mtcars$mpg, mtcars$cyl, sd)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The R List Class I}
+    \begin{itemize}
+      \item<+-> In {\bf mtcars}, split the miles-per-gallon (mpg) data according to the number of cylinders (cyl):
+        \begin{block}{}<+->
+<<>>=
+mtl <- split(mtcars$mpg, mtcars$cyl); mtl
+class(mtl)
+@
+        \end{block}
+      \item Now vectors in {\tt mtl}, a R list, can be accessed individually with \mycolor{\tt \$` `} and \mycolor{\tt [[ ]]}:
+        \begin{block}{}<+->
+<<>>=
+mtl$`6`
+mtl[[2]]
+@
+        \end{block}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{The R List Class II}
+    \begin{itemize}
+      \item<+-> In R, data frames can't hold vectors of different lengths, but lists can. 
+        \begin{block}{}<+->
+<<>>=
+vn <- c(1, 1.2, 2.3, 3.4, 4.5)
+vb <- c(TRUE, TRUE, FALSE)
+vc <- c('limestone', 'marl', 'oolite', 'CaCO3')
+@
+        \end{block}
+        \begin{block}{}<+->
+<<>>=
+data.frame(vn, vb, vc)
+@
+        \end{block}
+        \begin{block}{}<+->
+<<>>=
+list(vn, vb, vc)
+@
+        \end{block}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Base R Graphics I}
+  \begin{columns}
+    \begin{column}{0.58\textwidth}
+      \begin{block}{}<+->
+<<>>=
+pe <- read.table('data/prgeng.txt', header=TRUE)
+head(pe)
+@
+      \end{block}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{block}{}<+->
+<<out.width = "80%">>=
+plot(pe$age, pe$wageinc)
+@
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Base R Graphics II}
+  \begin{columns}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{}<+->
+<<out.width = "70%">>=
+pe2500 <- pe[sample(1:nrow(pe), 2500),]
+plot(pe2500$age, pe2500$wageinc)
+@
+      \end{block}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{block}{}<+->
+<<out.width = "70%">>=
+plot(pe2500$age, pe2500$wageinc, 
+     col=as.factor(pe2500$sex), 
+     xlab='age', ylab='wage', cex=0.6)
+@
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%\section{Intermediate R}
+
+%\section{References}
+%
+%\begin{frame}%[allowframebreaks]
+%  \frametitle{References}
+%  \nocite{*}
+%  \bibliographystyle{apalike}
+%  \bibliography{r}
+%\end{frame}
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Functions}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item<+->
+          \begin{block}{}<+->
+<<>>=
+@
+          \end{block}
+        \item
+          \begin{block}{}<+->
+<<>>=
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item 
+          \begin{block}{}<+->
+<<>>=
+@
+          \end{block}
+        \item
+          \begin{block}{}<+->
+<<>>=
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{R Factor Class}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item<+-> What are the classes of {\tt tg} and {\tt tg\$supp} ?
+          \begin{block}{}<+->
+<<>>=
+class(tg)
+class(tg$supp)
+@
+          \end{block}
+        \item R \mycolor{factors} are used when we have \emph{categorical} variables. Get the list of categories of {\tt tg\$supp} using
+          \begin{block}{}<+->
+<<>>=
+levels(tg$supp)
+@
+          \end{block}
+        \item levels $\equiv$ categories
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+        \item Factor
+          \begin{block}{}<+->
+<<>>=
+@
+          \end{block}
+        \item 
+          \begin{block}{}<+->
+<<>>=
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Base R Graphics III}
+  \begin{columns}
+    \begin{column}{0.55\textwidth}
+      \begin{itemize}
+        \item<+-> {\tt density}: a smoothed version of {\tt hist} 
+          \begin{block}{}<+->
+<<out.width = "70%">>=
+wage_by_gender <- split(pe$wageinc, pe$sex) 
+dm <- density(wage_by_gender[[1]]) 
+dw <- density(wage_by_gender[[2]]) 
+plot(dw, col='red')
+points(dm, cex=0.2)
+@
+          \end{block}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.41\textwidth}
+    \end{column}
+  \end{columns}
+\end{frame}
